@@ -24,19 +24,22 @@ import { ErrorState } from '../components/shared/ErrorState';
 import { triggerAssistant } from '../components/layout/AppShell';
 
 export function OverviewPage() {
-  const [summary, setSummary] = useState<DailySummary | null>(null);
-  const [loading, setLoading] = useState(true);
+  const cached = api.getCached<DailySummary>('/summary');
+  const [summary, setSummary] = useState<DailySummary | null>(cached);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
   const [togglingTaskId, setTogglingTaskId] = useState<string | null>(null);
 
-  const loadData = async () => {
+  const loadData = async (force = false) => {
     try {
-      setLoading(true);
+      if (!cached && !summary) setLoading(true);
       setError(null);
-      const data = await api.getDailySummary();
+      const data = await api.getDailySummary(force);
       setSummary(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load summary');
+      if (!summary) {
+        setError(err instanceof Error ? err.message : 'Failed to load summary');
+      }
     } finally {
       setLoading(false);
     }
@@ -46,7 +49,7 @@ export function OverviewPage() {
     loadData();
 
     const handleUpdate = () => {
-      loadData();
+      loadData(true);
     };
 
     window.addEventListener('carecircle-data-updated', handleUpdate);
@@ -98,7 +101,7 @@ export function OverviewPage() {
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <button
-            onClick={loadData}
+            onClick={() => loadData(true)}
             disabled={loading}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-stone-700 bg-white hover:bg-stone-50 border border-stone-200 rounded-lg shadow-xs transition-colors cursor-pointer disabled:opacity-50"
             title="Refresh dashboard data"

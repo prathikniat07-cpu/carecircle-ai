@@ -18,8 +18,9 @@ import { EmptyState } from '../components/shared/EmptyState';
 import { ErrorState } from '../components/shared/ErrorState';
 
 export function AppointmentsPage() {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = api.getCached<Appointment[]>('/appointments');
+  const [appointments, setAppointments] = useState<Appointment[]>(cached || []);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
 
   // Modal state
@@ -34,14 +35,16 @@ export function AppointmentsPage() {
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
 
-  const loadAppointments = async () => {
+  const loadAppointments = async (force = false) => {
     try {
-      setLoading(true);
+      if (!cached && !appointments.length) setLoading(true);
       setError(null);
-      const data = await api.getAppointments();
+      const data = await api.getAppointments(force);
       setAppointments(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load appointments');
+      if (!appointments.length) {
+        setError(err instanceof Error ? err.message : 'Failed to load appointments');
+      }
     } finally {
       setLoading(false);
     }
@@ -49,6 +52,10 @@ export function AppointmentsPage() {
 
   useEffect(() => {
     loadAppointments();
+
+    const handleUpdate = () => loadAppointments(true);
+    window.addEventListener('carecircle-data-updated', handleUpdate);
+    return () => window.removeEventListener('carecircle-data-updated', handleUpdate);
   }, []);
 
   const handleToggleTransport = async (apt: Appointment) => {

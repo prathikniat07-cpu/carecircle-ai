@@ -3,12 +3,16 @@ import { Outlet } from 'react-router-dom';
 import { Sparkles, Mic } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { AssistantPanel } from '../assistant/AssistantPanel';
+import { api } from '../../api/client';
 
 export function AppShell() {
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [initialQuery, setInitialQuery] = useState<string | undefined>(undefined);
 
   useEffect(() => {
+    // Warm up client cache instantly on app load
+    api.prefetchAll();
+
     const handleOpen = (e: CustomEvent<{ query?: string }>) => {
       setInitialQuery(e.detail?.query);
       setIsAssistantOpen(true);

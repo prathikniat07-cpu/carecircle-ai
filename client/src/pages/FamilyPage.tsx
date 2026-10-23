@@ -7,29 +7,38 @@ import { LoadingSkeleton } from '../components/shared/LoadingSkeleton';
 import { ErrorState } from '../components/shared/ErrorState';
 
 export function FamilyPage() {
-  const [caregivers, setCaregivers] = useState<Caregiver[]>([]);
-  const [tasks, setTasks] = useState<CareTask[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedCaregivers = api.getCached<Caregiver[]>('/caregivers');
+  const cachedTasks = api.getCached<CareTask[]>('/tasks');
+  const [caregivers, setCaregivers] = useState<Caregiver[]>(cachedCaregivers || []);
+  const [tasks, setTasks] = useState<CareTask[]>(cachedTasks || []);
+  const [loading, setLoading] = useState(!cachedCaregivers);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        setError(null);
-        const [cgs, allTasks] = await Promise.all([
-          api.getCaregivers(),
-          api.getTasks(),
-        ]);
-        setCaregivers(cgs);
-        setTasks(allTasks);
-      } catch (err) {
+  const load = async (force = false) => {
+    try {
+      if (!cachedCaregivers && !caregivers.length) setLoading(true);
+      setError(null);
+      const [cgs, allTasks] = await Promise.all([
+        api.getCaregivers(force),
+        api.getTasks(undefined, force),
+      ]);
+      setCaregivers(cgs);
+      setTasks(allTasks);
+    } catch (err) {
+      if (!caregivers.length) {
         setError(err instanceof Error ? err.message : 'Failed to load family circle');
-      } finally {
-        setLoading(false);
       }
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     load();
+
+    const handleUpdate = () => load(true);
+    window.addEventListener('carecircle-data-updated', handleUpdate);
+    return () => window.removeEventListener('carecircle-data-updated', handleUpdate);
   }, []);
 
   const getTaskStats = (caregiverId: string) => {

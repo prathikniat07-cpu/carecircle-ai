@@ -9,9 +9,11 @@ import { EmptyState } from '../components/shared/EmptyState';
 import { ErrorState } from '../components/shared/ErrorState';
 
 export function TasksPage() {
-  const [tasks, setTasks] = useState<CareTask[]>([]);
-  const [caregivers, setCaregivers] = useState<Caregiver[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedTasks = api.getCached<CareTask[]>('/tasks');
+  const cachedCaregivers = api.getCached<Caregiver[]>('/caregivers');
+  const [tasks, setTasks] = useState<CareTask[]>(cachedTasks || []);
+  const [caregivers, setCaregivers] = useState<Caregiver[]>(cachedCaregivers || []);
+  const [loading, setLoading] = useState(!cachedTasks);
   const [error, setError] = useState<string | null>(null);
 
   // Filters
@@ -29,18 +31,20 @@ export function TasksPage() {
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
-  const loadData = async () => {
+  const loadData = async (force = false) => {
     try {
-      setLoading(true);
+      if (!cachedTasks && !tasks.length) setLoading(true);
       setError(null);
       const [fetchedTasks, fetchedCaregivers] = await Promise.all([
-        api.getTasks(),
-        api.getCaregivers(),
+        api.getTasks(undefined, force),
+        api.getCaregivers(force),
       ]);
       setTasks(fetchedTasks);
       setCaregivers(fetchedCaregivers);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load tasks');
+      if (!tasks.length) {
+        setError(err instanceof Error ? err.message : 'Failed to load tasks');
+      }
     } finally {
       setLoading(false);
     }
@@ -48,6 +52,10 @@ export function TasksPage() {
 
   useEffect(() => {
     loadData();
+
+    const handleUpdate = () => loadData(true);
+    window.addEventListener('carecircle-data-updated', handleUpdate);
+    return () => window.removeEventListener('carecircle-data-updated', handleUpdate);
   }, []);
 
   const handleToggleStatus = async (task: CareTask) => {

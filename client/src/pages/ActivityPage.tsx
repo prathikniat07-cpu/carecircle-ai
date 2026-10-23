@@ -17,18 +17,21 @@ import { EmptyState } from '../components/shared/EmptyState';
 import { ErrorState } from '../components/shared/ErrorState';
 
 export function ActivityPage() {
-  const [events, setEvents] = useState<ActivityEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = api.getCached<ActivityEvent[]>('/activity');
+  const [events, setEvents] = useState<ActivityEvent[]>(cached || []);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
 
-  const loadActivity = async () => {
+  const loadActivity = async (force = false) => {
     try {
-      setLoading(true);
+      if (!cached && !events.length) setLoading(true);
       setError(null);
-      const data = await api.getActivity();
+      const data = await api.getActivity(force);
       setEvents(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load activity logs');
+      if (!events.length) {
+        setError(err instanceof Error ? err.message : 'Failed to load activity logs');
+      }
     } finally {
       setLoading(false);
     }
@@ -36,6 +39,10 @@ export function ActivityPage() {
 
   useEffect(() => {
     loadActivity();
+
+    const handleUpdate = () => loadActivity(true);
+    window.addEventListener('carecircle-data-updated', handleUpdate);
+    return () => window.removeEventListener('carecircle-data-updated', handleUpdate);
   }, []);
 
   const getActionMeta = (action: string) => {
@@ -105,7 +112,7 @@ export function ActivityPage() {
           </p>
         </div>
         <button
-          onClick={loadActivity}
+          onClick={() => loadActivity(true)}
           disabled={loading}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-stone-700 bg-white hover:bg-stone-50 border border-stone-200 rounded-lg shadow-xs transition-colors cursor-pointer disabled:opacity-50 self-start sm:self-auto"
         >
@@ -148,7 +155,7 @@ export function ActivityPage() {
                   <IconComponent size={16} />
                 </div>
 
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 w-full">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs font-bold text-stone-900">{evt.actor}</span>
@@ -173,20 +180,20 @@ export function ActivityPage() {
                   <p className="text-xs font-semibold text-stone-800">{evt.target_label}</p>
                   
                   {evt.details && (
-                    <div className="mt-2 text-xs bg-stone-50/90 border border-stone-200/70 rounded-lg p-2.5 max-w-3xl">
+                    <div className="mt-2 text-xs bg-stone-50/90 border border-stone-200/70 rounded-lg p-3 w-full">
                       {evt.details.includes('[Simulated SES Mode]') ? (
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
                               Simulated SES
                             </span>
-                            <span className="text-[11px] font-mono text-stone-600 break-all">
+                            <span className="text-[11px] font-mono text-stone-600 break-words">
                               {evt.details.replace('[Simulated SES Mode] ', '')}
                             </span>
                           </div>
                         </div>
                       ) : (
-                        <p className="text-stone-600 leading-relaxed">{evt.details}</p>
+                        <p className="text-stone-600 leading-relaxed break-words">{evt.details}</p>
                       )}
                     </div>
                   )}
