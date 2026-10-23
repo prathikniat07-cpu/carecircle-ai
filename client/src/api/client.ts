@@ -48,6 +48,8 @@ export const api = {
   // Appointments
   getAppointments: () => request<import('../types').Appointment[]>('/appointments'),
   getAppointment: (id: string) => request<import('../types').Appointment>(`/appointments/${id}`),
+  createAppointment: (data: Partial<import('../types').Appointment>) =>
+    request<import('../types').Appointment>('/appointments', { method: 'POST', body: JSON.stringify(data) }),
   updateAppointment: (id: string, data: Partial<import('../types').Appointment>) =>
     request<import('../types').Appointment>(`/appointments/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
 

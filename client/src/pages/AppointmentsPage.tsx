@@ -60,11 +60,7 @@ export function AppointmentsPage() {
       );
 
       // Call backend
-      await fetch(`/api/appointments/${apt.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transport_status: nextStatus }),
-      });
+      await api.updateAppointment(apt.id, { transport_status: nextStatus });
     } catch (err) {
       console.error('Failed to update transport:', err);
       loadAppointments();
@@ -81,24 +77,16 @@ export function AppointmentsPage() {
     try {
       setSaving(true);
       setModalError(null);
-      const res = await fetch('/api/appointments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: title.trim(),
-          date,
-          time,
-          duration_minutes: duration,
-          location: location.trim() || null,
-          transport_status: transportStatus,
-          followup_status: 'pending',
-          notes: notes.trim() || null,
-        }),
+      await api.createAppointment({
+        title: title.trim(),
+        date,
+        time,
+        duration_minutes: duration,
+        location: location.trim() || null,
+        transport_status: transportStatus,
+        followup_status: 'pending',
+        notes: notes.trim() || null,
       });
-
-      if (!res.ok) {
-        throw new Error('Failed to create appointment');
-      }
 
       setIsModalOpen(false);
       setTitle('');
