@@ -1,6 +1,18 @@
 {
   "rewrites": [
     {
+      "source": "/api/:match*",
+      "destination": "https://carecircle-backend-zzof.onrender.com/api/:match*"
+    },
+    {
+      "source": "/mcp/:match*",
+      "destination": "https://carecircle-backend-zzof.onrender.com/mcp/:match*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://carecircle-backend-zzof.onrender.com/health"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
