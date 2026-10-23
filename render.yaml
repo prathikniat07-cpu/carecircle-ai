@@ -1,0 +1,32 @@
+# CareCircle AI — Render Blueprint Configuration
+# Optional: Use via Render Dashboard "Blueprints" or use as reference for manual setup
+services:
+  - type: web
+    name: carecircle-backend
+    runtime: node
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    plan: starter
+    healthCheckPath: /health
+    disk:
+      name: carecircle-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: /var/data/carecircle.db
+      - key: CLIENT_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SES_SENDER_EMAIL
+        value: care@carecircle.demo
+      - key: AWS_REGION
+        value: us-east-1
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false

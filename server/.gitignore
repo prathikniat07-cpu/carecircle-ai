@@ -1,0 +1,20 @@
+node_modules/
+dist/
+*.tsbuildinfo
+
+# SQLite databases & runtime storage
+data/*.db
+data/*.db-wal
+data/*.db-shm
+*.db
+*.db-wal
+*.db-shm
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+logs/
+*.log
+.DS_Store

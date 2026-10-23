@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+@import "tailwindcss";
+
+/* ========================================
+   CareCircle AI — Design Tokens
+   Based on CareCircle_AI_DESIGN.md
+   ======================================== */
+
+@theme {
+  /* Brand Colors */
+  --color-forest: #23483D;
+  --color-forest-dark: #19372F;
+  --color-forest-light: #2d5a4c;
+  --color-ivory: #F7F6F0;
+  --color-sage: #E7EEE7;
+  --color-sage-dark: #d4ddd4;
+
+  /* Semantic Colors */
+  --color-surface: #FFFFFF;
+  --color-background: #F7F6F0;
+  --color-border: #E5E8E2;
+  --color-border-strong: #cdd2c9;
+
+  /* Text Colors */
+  --color-text-primary: #202A26;
+  --color-text-secondary: #68736D;
+  --color-text-tertiary: #8f998f;
+  --color-text-inverse: #FFFFFF;
+
+  /* Status Colors */
+  --color-amber: #A96A20;
+  --color-amber-light: #fdf3e7;
+  --color-amber-bg: #fef9f2;
+  --color-error: #B54747;
+  --color-error-light: #fef2f2;
+  --color-success: #2d7a4f;
+  --color-success-light: #f0fdf4;
+
+  /* Typography */
+  --font-heading: 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Spacing Scale (4px base) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 48px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  /* Layout */
+  --sidebar-width: 240px;
+  --assistant-width: 380px;
+  --content-max-width: 1440px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+}
+
+/* ========================================
+   Base Styles
+   ======================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* Tabular numerals for times and counts */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-forest);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
