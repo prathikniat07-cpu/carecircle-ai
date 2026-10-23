@@ -8,6 +8,14 @@
 
 ---
 
+### 🌐 Live Public Deployment
+- **Frontend Web Application (Vercel):** [https://client-psi-kohl-70.vercel.app](https://client-psi-kohl-70.vercel.app)
+- **Backend Web Service (Render):** [https://carecircle-backend-zzof.onrender.com](https://carecircle-backend-zzof.onrender.com)
+- **API Health Endpoint:** [https://client-psi-kohl-70.vercel.app/api/health](https://client-psi-kohl-70.vercel.app/api/health)
+- **Streamable MCP Server Endpoint:** `POST https://client-psi-kohl-70.vercel.app/mcp`
+
+---
+
 ## 1. Product Vision & Mission
 
 Family caregiving for an aging relative is often fragmented across phone calls, notes, messaging apps, and memory. This fragmentation leads to missed appointments, forgotten medication refills, and confusion over who owns critical tasks.

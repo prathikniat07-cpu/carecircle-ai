@@ -42,23 +42,29 @@ Phase 5 — Quality, Hardening & Demo Readiness
   - **Enhancement F (Caregiver Usability Protocol):**
     - `docs/CAREGIVER_TEST_SCRIPT.md`: Usability testing script comparing manual baseline against CareCircle AI.
 
+### Phase 5 & 6 — Quality Hardening & Public Cloud Deployment
+- **Status:** ✅ Complete
+- **Public Frontend URL (Vercel):** https://client-psi-kohl-70.vercel.app
+- **Public Backend Web Service (Render):** https://carecircle-backend-zzof.onrender.com
+- **Live Health Endpoint:** https://client-psi-kohl-70.vercel.app/api/health
+- **Live Streamable MCP Endpoint:** `POST https://client-psi-kohl-70.vercel.app/mcp`
+- **Architecture:** React 19 + TypeScript frontend on Vercel with reverse-proxy rewrites; Express 5 + Node.js 24 on Render with SQLite storage and idempotent auto-seeding.
+
 ## Verified Test Results
 
 | Test / Check | Command / Endpoint | Result |
 |---|---|---|
 | Client Production Build | `npm run build` in `client` | ✅ Pass (code 0) |
 | Server Compilation | `npm run build` in `server` | ✅ Pass (code 0) |
-| MCP `tools/list` | `POST /mcp` (`tools/list`) | ✅ Returns full tool catalog with JSON schemas |
-| MCP `tools/call` | `POST /mcp` (`tools/call` for `get_daily_summary`) | ✅ Returns live database records |
-| Assistant Chat | `POST /api/assistant/chat` | ✅ Handles 5 sample requests + reminders |
-| Approval Gate & SES | `POST /api/assistant/confirm/:id` | ✅ Executes action, records audit event |
-| Duplicate Prevention | `POST /api/assistant/confirm/:id` (2nd call) | ✅ Rejects with "Action already confirmed" |
-| Proactive Detection | `POST /api/proactive/check` | ✅ Detects 11:00 AM transport risk & deduplicates |
-| Full Audit Logging | `GET /api/activity` | ✅ Reflects all mutations and SES dispatches |
+| Automated Test Suite | `npm test` in `server` | ✅ 9/9 Tests Pass (code 0) |
+| Live Vercel Frontend | `https://client-psi-kohl-70.vercel.app` | ✅ HTTP 200 Live |
+| Live Render Health | `GET /health` on Render | ✅ `{"status":"healthy","database":"connected"}` |
+| Live Proxied API | `GET /api/summary` via Vercel | ✅ Returns live records for Meera Rao |
+| Live MCP `tools/list` | `POST /mcp` via Vercel | ✅ Returns 9 structured tools catalog |
+| Live Proactive Risk Engine | `POST /api/proactive/check` | ✅ Detects 11:00 AM clinic visit transport risk |
+| Live Human Approval Gate | `POST /api/assistant/confirm/:id` | ✅ Executes simulated SES & writes audit log |
+| Live Idempotency Enforcement | `POST /api/assistant/confirm/:id` (2nd call) | ✅ Rejects duplicate token with HTTP 400 |
+| Live Audit Trail | `GET /api/activity` | ✅ Reflects all actions and SES events |
 
 ## Active Issues / Blockers
-None.
-
-## Next Steps (Phase 5 & Demo Packaging)
-- [ ] End-to-end rehearsal of the 2-3 minute demo script following the narrative: *Detect → Explain → Propose → Obtain Approval → Execute → Verify → Audit*.
-- [ ] README documentation updates with run, test, and hackathon judge verification instructions.
+None. Live public URLs are fully operational.
